@@ -1,0 +1,176 @@
+from api.blueprints import admin  
+from flask import jsonify, request  
+from api.admin_api.utils.user_utils import*
+from api.admin_api.utils.scheme_utils import*
+from api.decoraters import token_required
+from datetime import date
+from time import sleep
+
+@admin.route('/')
+def home():
+    """ 
+    Home route handler
+    Returns a simple JSON response indicating the home page
+    """
+    try:
+        return jsonify({"message": "This is home page"}), 200
+    except Exception as e:
+        return jsonify({"error": "An unexpected error occurred", "message": str(e)}), 500
+
+@admin.route('/pending_signups', methods=['GET'])
+def pending_signups():
+    """ 
+    Retrieve pending signups
+    GET endpoint to fetch all users from pending signups
+    Returns: JSON response with list of pending users or error message
+    """
+    try:
+        data = get_user_from_pending_signups()
+        if not data:
+            return jsonify({"message": "No pending signups found"}), 404
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to retrieve pending signups", "message": str(e)}), 500
+
+@admin.route('/approve_or_reject_pending_signups', methods=['POST'])  
+def approve_or_reject():
+    """
+    Approve or reject pending signups
+    POST endpoint to update the status of a pending signup
+    Requires JSON payload with 'email' and 'status' fields
+    Returns: JSON response indicating success or failure
+    """
+    try:
+        # Check if request contains JSON data
+        if not request.is_json:
+            return jsonify({"message": "Request must contain JSON data"}), 400
+
+        data = request.get_json()  # Safely get JSON data from request
+        
+        # Validate required fields
+        email = data.get("email")
+        status = data.get("status")
+        
+        if not all([email, status]):
+            return jsonify({"message": "All fields (email, status) are required"}), 400
+
+        # Update the signup status
+        update_status = update_pending_signups_status(email, status)
+        
+        # need to implement that the user is present or not 
+        if not update_status:
+            return jsonify({"message": "Unable to update the status"}), 400
+    
+        res = insert_user_to_users(email)
+        sleep(2)
+        res_2 = insert_user_to_user_point(email)
+        return jsonify({"message": "Status updated successfully"}), 200
+
+    except ValueError as ve:
+        return jsonify({"error": "Invalid input data", "message": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"error": "An error occurred while processing the request", "message": str(e)}), 500
+        
+@admin.route('/delete_scheme',methods=['DELETE'])
+def delete_scheme():
+    try:
+        if not request.is_json:
+            return jsonify({"message": "Request must contain JSON data"}), 400
+        data = request.get_json()
+        scheme_title = data.get("scheme_title")
+        
+        if not data:
+            return jsonify({"message":"JSON is cannot be empty"}), 400
+        
+        if not scheme_title:
+            return jsonify({"message":"Scheme Title is required"}), 400
+        response = remove_scheme(scheme_title)
+    
+        if not response:
+            return jsonify({"message":"Enter a valid Scheme Title"}), 400
+        return jsonify({"message":"Scheme delete","scheme_title":scheme_title}),200
+    except Exception:
+        return jsonify({"message":"Internal server error occured"}), 500
+    
+@admin.route('/add_scheme',methods=["POST"])
+def add_schemes():
+    try:
+        if not request.is_json:
+            return jsonify({"message": "Request must contain JSON data"}), 400
+        data = request.get_json()
+        
+        if not data or data is None:
+            return jsonify({"message":"JSON payload required"}), 400
+        
+        scheme_title = data.get("scheme_title")
+        scheme_valid_from = data.get("scheme_valid_from")
+        scheme_valid_to = data.get("scheme_valid_to")
+        scheme_perks = data.get("scheme_perks")
+        points = data.get("points")
+        
+        if not all([scheme_title,scheme_valid_from,scheme_valid_to, scheme_perks, points]):
+            return jsonify({"message":"All fields required"}), 400
+        if not all(isinstance(x, str) for x in [scheme_title, scheme_valid_from, scheme_valid_to, scheme_perks]):
+            return jsonify({"message":"Type error to this scheme_title | scheme_valid_from | scheme_valid_to | scheme_perks"}), 400
+        if not isinstance(points, int):
+            return jsonify({"message":f"The points should be type of int, but provided {type(points).__name__}"}),400
+        
+        response = add_scheme(scheme_title,scheme_valid_from, scheme_valid_to, scheme_perks, points)
+        if not response:
+            return ({"message":"Unable to add scheme please try later"}), 400
+        return jsonify({"message":"Scheme added","scheme_title":scheme_title}), 200
+    except Exception as e:
+        return jsonify({"message":f"Internal server error {str(e)}"}), 500
+        
+@admin.route('/update_scheme', methods=["PUT"])
+def update_schemes():
+    try:
+        if not request.is_json:
+            return jsonify({"message": "Request must contain JSON data"}), 400
+        data = request.get_json()
+        if not data or data is None:
+            return jsonify({"message":"JSON payload required"})
+        
+        scheme_title = data.get("scheme_title")
+        scheme_valid_from = data.get("scheme_valid_from")
+        scheme_valid_to = data.get("scheme_valid_to")
+        scheme_perks = data.get("scheme_perks")
+        points = data.get("points")
+        
+        if not scheme_title:
+            return jsonify({"message":"Scheme title required"}), 400
+        if not any([scheme_valid_from, scheme_valid_to, scheme_perks, points]):
+            return jsonify({"message": "At least one of the following fields is required: valid_from, valid_to, perks, points"}), 400
+        if points:
+            if not isinstance(points, int):
+                return jsonify({"message":f"The type of point should be int, but provided {type(points).__name__}"}), 400
+        response = update_scheme(scheme_title, scheme_valid_from, scheme_valid_to, scheme_perks, points)
+        
+        if not response:
+            return jsonify({"message":"Unable update Scheme"}), 400
+        return jsonify({"message":"Scheme Updated","Scheme title":scheme_title}), 200
+    except Exception as e:
+        return jsonify({"message":f"Internal server error {str(e)}"}), 500
+    
+@admin.route('/get_schemes',methods=["GET"])
+def get_schemes():
+    try:
+        response = get_scheme()
+        
+        if not response or response is None:
+            return jsonify({"message":"Unable to fetch scheme, Please try later"}), 400
+        return jsonify({"message":response}), 200
+    except Exception:
+        return jsonify({"message":"Internal server error"})
+    
+@admin.route('/get_scheme_to_approve')
+def get_scheme_to_approve():
+    pass
+    
+@admin.route('/approve_scheme')
+def approve_scheme():
+    pass
+
+@admin.route("/reject_scheme")
+def reject_scheme():
+    pass

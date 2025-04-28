@@ -1,0 +1,40 @@
++----------------+       +-----------------+
+|   users        |<----->|  user_points    |
+|----------------|       |-----------------|
+| id (PK, AI)    |       | id (PK, AI)     |
+| name           |       | email (FK)      |
+| email (UK)     |       | points          |
+| password       |       +-----------------+
+| create_on      |
++----------------+
+
+       ^                  +-----------------+
+       |                  | otp_verification|
+       |                  |-----------------|
+       +----------------->| id (PK, AI)     |
+                          | email           |
+                          | otp             |
+                          | created         |
+                          | valid_till      |
+                          +-----------------+
+
+       ^                  +-----------------+
+       |                  | pending_signups |
+       +----------------->|-----------------|
+                          | id (PK, AI)     |
+                          | name            |
+                          | email (UK)      |
+                          | password        |
+                          | created         |
+                          | status          |
+                          | email_status    |
+                          +-----------------+
+
+                          +-----------------+
+                          |   points        |
+                          |-----------------|
+                          | points (PK)     |
+                          | status          |
+                          | points_value    |
+                          | expiry_date     |
+                          +-----------------+
