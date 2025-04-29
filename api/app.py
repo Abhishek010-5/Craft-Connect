@@ -31,11 +31,35 @@ def create_app():
     return app
 
 
-if __name__ == '__main__':
-    from login_api.routes import*
-    from points_api.routes import*
-    from admin_api.routes import*
-    from user_api.routes import*
-    
-    app = create_app()
-    app.run()  
+
+from login_api.routes import*
+from points_api.routes import*
+from admin_api.routes import*
+from user_api.routes import*
+
+app = create_app()
+ 
+@app.route('/')
+def home():
+    return jsonify({"message":"API is working"})
+
+def create_error_response(status_code, error, message):
+    """Helper function to create a consistent error response."""
+    response = {
+        "status": status_code,
+        "error": error,
+        "message": message
+    }
+    return jsonify(response), status_code
+
+@app.errorhandler(404)
+def not_found(error):
+    return create_error_response(404, "Not Found", "The requested resource was not found on the server.")
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return create_error_response(500, "Internal Server Error", "Something went wrong on our end. Please try again later.")
+
+@app.errorhandler(405)
+def method_not_allowed_error(error):
+    return create_error_response(405, "Method not allowed", "Invalid request. Please check the request type")

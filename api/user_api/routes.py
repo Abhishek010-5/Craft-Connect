@@ -1,6 +1,6 @@
 from api.blueprints import user
 from flask import jsonify, request
-from api.user_api.utils.users_util import get_user_details, get_user_with_most_points, get_users_, is_scheme_date_valid
+from api.user_api.utils.users_util import get_user_details, get_user_with_most_points, get_users_, is_scheme_date_valid, get_schemes_
 from psycopg2 import DatabaseError
 
 
@@ -95,16 +95,45 @@ def get_users():
         print(f"errror:{str(e)}")
         return jsonify({"message":"Internal server error"}), 500
     
-
-@user.route('/scheme_status')
-def scheme_status():
-    # this returns an statment if there no scheme else return the scheme details 
-    pass
 @user.route('/redeem_scheme')
 def redeem_scheme():
     # this the route to apply for the scheme
     pass 
 
-@user.route('/get_schemes')
+@user.route('/scheme_status',methods=["POST"])
+def scheme_status():
+    try:
+        if not request.is_json:
+            return jsonify({"message":"JSON paylaod required"}), 400
+        data = request.get("email")
+        if not data:
+            return jsonify({"message":"JSON cannot be empty"}), 400
+        email = data.get("email").strip()
+        
+        status = scheme_status(email)
+        
+        if not status:
+            return jsonify({"message":"No scheme found"}), 404
+        return jsonify({"response":status}), 200
+    except DatabaseError as dber:
+        print(f" Database error {str(dber)}")
+        return jsonify({"message":"Database error"}), 500
+    except Exception as e:
+        print(f"Internal server error {str(e)}")
+        return jsonify({"message":"Internal server error"}), 500
+        
+# need to be added to main api
+@user.route('/get_schemes_for_user',methods=["GET"])
 def get_scheme():
-    pass
+    try:
+        schemes = get_schemes_()
+        
+        if not schemes:
+            return jsonify({"message":"No scheme found"}), 404
+        return jsonify({"response":schemes}), 200
+    except DatabaseError as dber:
+        print(f"Database error occured {str(dber)}")
+        return jsonify({"message":"Database error"}), 500
+    except Exception as e:
+        print(f"Internal server error")
+        return jsonify({"message":"Internal server error"}), 500

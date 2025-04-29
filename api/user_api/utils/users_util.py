@@ -205,5 +205,88 @@ def scheme_already_applied(email:str)->bool:
     except Exception as e:
         raise RuntimeError(f"Error: {str(e)}")
     
-def scheme_status()->str:
-    pass
+def scheme_status(email: str) -> Optional[list[dict]| None]:
+    """
+    Retrieves the status of schemes applied by a user based on their email.
+
+    Args:
+        email (str): The email address associated with the user applying for schemes.
+
+    Returns:
+        Optional[list[dict]]: A list of dictionaries containing scheme status details,
+            or None if no schemes are found. Each dictionary contains:
+            - scheme_title (str): The title of the scheme, or "NA" if not available.
+            - scheme_status (str): The status of the scheme (e.g., "Pending", "Approved", "Rejected"),
+              or "NA" if not available.
+
+    Raises:
+        DatabaseError: If a database error occurs during query execution.
+        RuntimeError: If an unexpected error occurs during execution.
+
+    Examples:
+        >>> scheme_status_user_api("user@example.com")
+        [{'scheme_title': 'Summer Bonanza', 'scheme_status': 'Pending'}]
+    """
+    try:
+        query = scheme_status_query()
+        params = {"email":email}
+        response = execute_query(query, params, fetch_results=True)
+        
+        if not response or response == []:
+            return None
+        status = []
+        
+        for row in response:
+            scheme_status = {
+                "scheme_title":row[0] if row[0] else "NA",
+                "scheme_status":row[1] if row[1] else "NA",
+            }
+            status.append(scheme_status)
+        return status
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error {str(dber)}")
+    except Exception as e:
+        raise RuntimeError(str(e))
+        
+def get_schemes_()->Optional[ list[dict] | None]:
+    """
+    This function gets the schemes for the user that are active or are in the scheme table
+    
+    Returns:
+        Optional[list[dict] | None]: A list of dictionaries containing scheme details, or None if no schemes are found.
+        Each dictionary contains:
+            - shceme_id (str): The ID of the scheme, or "NA" if not available.
+            - scheme_title (str): The title of the scheme, or "NA" if not available.
+            - scheme_valid_from (str): The start date of the scheme, or "NA" if not available.
+            - scheme_valid_to (str): The end date of the scheme, or "NA" if not available.
+            - perks (str): The perks associated with the scheme, or "NA" if not available.
+            - points (int): The points associated with the scheme, defaults to 10000 if not available.
+    
+    Raises:
+        DatabaseError: If a database error occurs during query execution.
+        RuntimeError: If an unexpected error occurs.
+    """
+    try:
+        query = get_scheme_query()
+        response = execute_query(query, fetch_results=True)
+        
+        if not response or response == []:
+            return None
+        
+        scheme = []
+        for row in response:
+            scheme_details = {
+                "shceme_id":row[0] if row[0] else "NA",
+                "scheme_title":row[1] if row[1] else "NA",
+                "scheme_valid_from":row[2] if row[2] else "NA",
+                "scheme_valid_to":row[3] if row[3] else "NA",
+                "perks":row[4] if row[4] else "NA",
+                "points":row[5] if row[5] else 10000
+            }
+            scheme.append(scheme_details)
+        return scheme
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error occured {str(dber)}")
+    except Exception as e:
+        raise RuntimeError(str(e))
+        
