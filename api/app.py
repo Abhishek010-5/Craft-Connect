@@ -1,11 +1,14 @@
 from flask import Flask
 import logging
+from flask_cors import CORS
 from config import SECRET_KEY
 
 def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = SECRET_KEY
+    
+    CORS(app)
 
     # Configure logging
     logging.basicConfig(

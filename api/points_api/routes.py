@@ -42,7 +42,7 @@ def redeem_points():
         print(f"Error in :{str(e)}")
         return jsonify({"error":"Internal server error"}), 500
 
-@points.route('/get_points', methods=["GET"])
+@points.route('/get_points', methods=["GET","POST"])
 def get_points():
     try:
         if not request.is_json:
