@@ -216,8 +216,8 @@ def verify_email(email, field):
         otp_details = get_otp()
         if not otp_details:
             return jsonify({"message":"Unable to fetch otp"})
-        otp = otp.get("otp")
-        valid_till = otp.get("valid_till")
+        otp = otp_details.get("otp")
+        valid_till = otp_details.get("valid_till")
         curr_time = datetime.now()
         if valid_till < curr_time:
             jsonify({"message":"Opt time out "}), 400
