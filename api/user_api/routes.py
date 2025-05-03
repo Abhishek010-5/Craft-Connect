@@ -1,9 +1,8 @@
 from api.blueprints import user
 from flask import jsonify, request
-from api.user_api.utils.users_util import get_user_details, get_user_with_most_points, get_users_, is_scheme_date_valid, get_schemes_
+from api.user_api.utils.users_util import*
 from psycopg2 import DatabaseError
-
-
+from api.points_api.utils.points_util import get_user_points
 @user.route('/get_user_profile',methods=["GET"])
 def get_user_profile():
     try:
@@ -95,11 +94,6 @@ def get_users():
         print(f"errror:{str(e)}")
         return jsonify({"message":"Internal server error"}), 500
     
-@user.route('/redeem_scheme')
-def redeem_scheme():
-    # this the route to apply for the scheme
-    pass 
-
 @user.route('/scheme_status',methods=["POST"])
 def scheme_status():
     try:
@@ -137,3 +131,42 @@ def get_scheme():
     except Exception as e:
         print(f"Internal server error")
         return jsonify({"message":"Internal server error"}), 500
+
+@user.route('/redeem_scheme',methods=["POST"])
+def redeem_scheme():
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Request should contain JSON"}), 400
+        data = request.get_json()
+        if not data:
+            return jsonify({"message":"JSON cannot be empty"}), 400
+        email = data.get("email")
+        scheme_id = data.get("scheme_id")
+        if not email or not scheme_id:
+            return jsonify({"message":"Email and Scheme_id required"}), 400
+        email = email.strip()
+        
+    # need check if user have applied before or not
+        if scheme_already_applied(email):
+            return jsonify({"message":"Scheme alredy applied"}),400
+        if not is_scheme_date_valid(scheme_id):
+            return jsonify({"message":"Scheme expired"}), 400
+    # need to check if user have enough point to apply scheme
+        required_points = get_points_required_for_scheme(int(scheme_id))
+        user_points = get_user_points()
+        if user_points < required_points:
+            return jsonify({"message":"Insufficient points"}), 400
+        user_details = get_user_details(email)
+        name = user_details.get("name")
+        insert_scheme(name, email, scheme_id)
+    
+        return jsonify({"message":"Applied for scheme"}), 200
+    except DatabaseError as dber:
+        print(str(dber))
+        return jsonify({"Database error"}), 500
+    except Exception as e:
+        print(str(e))
+        return jsonify({"message":"Internal server error"}), 500
+    
+    
+    

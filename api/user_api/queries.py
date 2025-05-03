@@ -109,3 +109,15 @@ def scheme_status_query()->str:
         LEFT JOIN schemes_redemption sr ON s.scheme_id = sr.scheme_id
         WHERE sr.email = %(email)s;
 """
+
+def get_points_required_for_scheme_query() -> str:
+    """
+    Returns the SQL query to retrieve the points required for a specific scheme.
+    Returns:
+        str: The SQL query string to fetch points from the scheme table based on scheme_id.
+    """
+    return"""
+        SELECT points
+        FROM scheme
+        WHERE scheme_id = %(scheme_id)s;
+"""

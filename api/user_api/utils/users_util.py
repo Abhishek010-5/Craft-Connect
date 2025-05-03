@@ -290,3 +290,30 @@ def get_schemes_()->Optional[ list[dict] | None]:
     except Exception as e:
         raise RuntimeError(str(e))
         
+def get_points_required_for_scheme(scheme_id: int) -> Optional[int | None]:
+    """
+    Retrieves the points required for a specific scheme from the database.
+
+    Args:
+        scheme_id (int): The unique identifier of the scheme.
+
+    Returns:
+        Optional[int | None]: The number of points required for the scheme, or None if not found.
+    Raises:
+        DatabaseError: If a database-related error occurs during query execution.
+        RuntimeError: If an unexpected error occurs during the operation.
+    """
+    try:
+        query = get_points_required_for_scheme_query()
+        params = {"scheme_id": scheme_id}
+        response = execute_query(query, params, fetch_results=True)
+        
+        if not response or response == []:
+            return None
+        points = response[0][0]
+        
+        return int(points)
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error :{str(dber)}")
+    except Exception as e:
+        raise RuntimeError({str(e)})
