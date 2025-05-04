@@ -3,7 +3,7 @@ from flask import jsonify, request
 from api.user_api.utils.users_util import*
 from psycopg2 import DatabaseError
 from api.points_api.utils.points_util import get_user_points
-@user.route('/get_user_profile',methods=["GET"])
+@user.route('/get_user_profile',methods=["POST"])
 def get_user_profile():
     try:
         if not request.is_json:
