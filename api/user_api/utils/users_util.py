@@ -276,7 +276,7 @@ def get_schemes_()->Optional[ list[dict] | None]:
         scheme = []
         for row in response:
             scheme_details = {
-                "shceme_id":row[0] if row[0] else "NA",
+                "scheme_id":row[0] if row[0] else "NA",
                 "scheme_title":row[1] if row[1] else "NA",
                 "scheme_valid_from":row[2] if row[2] else "NA",
                 "scheme_valid_to":row[3] if row[3] else "NA",
