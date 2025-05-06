@@ -153,7 +153,7 @@ def redeem_scheme():
             return jsonify({"message":"Scheme expired"}), 400
     # need to check if user have enough point to apply scheme
         required_points = get_points_required_for_scheme(int(scheme_id))
-        user_points = get_user_points()
+        user_points = get_user_points(email)
         if user_points < required_points:
             return jsonify({"message":"Insufficient points"}), 400
         user_details = get_user_details(email)
