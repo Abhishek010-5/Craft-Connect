@@ -81,3 +81,51 @@ def get_scheme_query() -> str:
     return """
         SELECT * FROM scheme;
 """
+
+def get_insert_admin_query() -> str:
+    """
+    Returns the SQL query to insert a new admin user into the database.
+
+    Returns:
+        str: The SQL query string for inserting an admin with email and password.
+    """
+    return """
+        INSERT INTO admin (email, password) 
+        VALUES (%(email)s, %(password)s);
+"""
+
+def get_admin_password_query() -> str:
+    """
+    Returns the SQL query to retrieve the password of an admin user by email.
+
+    Returns:
+        str: The SQL query string for selecting the password of an admin by email.
+    """
+    return """
+        SELECT password FROM admin
+        WHERE email = %(email)s;
+"""
+
+def get_admin_exists_query() -> str:
+    """
+    Returns the SQL query to check if an admin user exists by email.
+
+    Returns:
+        str: The SQL query string for checking the existence of an admin by email.
+    """
+    return """
+        SELECT 1 FROM admin
+        WHERE email = %(email)s;
+"""
+
+def delete_admin_query() -> str:
+    """
+    Returns the SQL query to delete an admin user by email.
+
+    Returns:
+        str: The SQL query string for deleting an admin by email.
+    """
+    return """
+        DELETE FROM admin 
+        WHERE email = %(email)s;
+"""

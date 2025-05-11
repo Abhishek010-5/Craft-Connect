@@ -2,9 +2,14 @@ from api.blueprints import admin
 from flask import jsonify, request  
 from api.admin_api.utils.user_utils import*
 from api.admin_api.utils.scheme_utils import*
+from api.admin_api.utils.admin_utils import*
 from api.decoraters import token_required
 from datetime import date
 from time import sleep
+from api.login_api.utils.validate_utils import*
+import jwt
+from datetime import timedelta
+from api.config import JWT_ALGORITHM, JWT_EXPIRY_MINUTES,JWT_SECRET_KEY
 
 @admin.route('/')
 def home():
@@ -174,3 +179,39 @@ def approve_scheme():
 @admin.route("/reject_scheme")
 def reject_scheme():
     pass
+
+@admin.route('/admin_login', methods=["POST"])
+def admin_login():
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Request must contain JSON payload"}), 400
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"message":"Payload cannot be empty"}), 400
+        email = data.get("email")
+        password = data.get("password")
+        
+        if not email or not password:
+            return jsonify({"message":"All fields required"}), 400
+        if not validate_email(email):
+            return jsonify({"message":"Invalid email format"}), 400
+        if not validate_password(password):
+            return jsonify({"message":"Invalid password format or lenght"}), 400
+        if not is_admin_present(email):
+            return jsonify({"message":"Invalid email or password"}), 400
+        if not validate_admin_password(email, password):
+            return jsonify({"message":"Invalid email or password"}), 400
+        payload = {
+        'sub': email, 
+        'iat': datetime.utcnow(),  # Issued at
+        'exp': datetime.utcnow() + timedelta(minutes=JWT_EXPIRY_MINUTES)  # Expiration
+        }
+        token = jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+        return jsonify({"message": "Login Successful", "token": token, "user": email}), 200
+    except DatabaseError as dber:
+        print(f"Database error: {str(dber)}")
+        return jsonify({"Database error"}), 500
+    except Exception as e:
+        print(f"Internal server error {str(e)}"), 500
