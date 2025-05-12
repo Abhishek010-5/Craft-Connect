@@ -10,7 +10,7 @@ from api.login_api.utils.validate_utils import*
 import jwt
 from datetime import timedelta
 from api.config import JWT_ALGORITHM, JWT_EXPIRY_MINUTES,JWT_SECRET_KEY
-
+from api.login_api.utils.otp_utlis import*
 @admin.route('/')
 def home():
     """ 
@@ -179,6 +179,68 @@ def approve_scheme():
 @admin.route("/reject_scheme")
 def reject_scheme():
     pass
+@admin.route('/send_otp',methods=["POST"])
+def send_otp():
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Request must contain JSON payload"}), 400
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"message":"Payload cannot be empty"}), 400
+        email = data.get("email")
+        if not email:
+            return jsonify({"message":"Email is required"}), 400
+        email = email.strip()
+        if not validate_email(email):
+            return jsonify({"message":"Wrong email format"}), 400
+        
+        if not is_admin_present(email):
+            return jsonify({"message":"Wring mail id"}), 400
+        
+        otp = generate_otp()
+        response = send_otp(email, otp)
+        if not response:
+            return jsonify({"message":"Not able to send otp"}), 400
+        res = send_otp_to_db(email, otp)
+        
+        return jsonify({"message":"OTP sent"}), 200
+    except Exception as e:
+        print(f"Internal server error {str(e)}")
+        return jsonify({"message":"Internal server error"}), 500
+        
+@admin.route('/verify_otp',methods=["POST"])
+def verify_otp():
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Request must contain JSON payload"}), 400
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"message":"Payload cannot be empty"}), 400
+        email = data.get("email")
+        otp = data.get("opt")
+        
+        if not otp or not email:
+            return jsonify({"message":"All fiels required"}), 400
+        otp_details = get_otp(email)
+        
+        if not otp_details:
+            return jsonify({"message":"Unable to fetch otp"})
+        
+        db_otp = otp_details.get("otp")
+        valid_till = otp_details.get("valid_till")
+        curr_time = datetime.now()
+        
+        if valid_till < curr_time:
+            jsonify({"message":"Opt time out "}), 400
+            
+        if str(db_otp) != str(otp):
+            return jsonify({"message":"Incorrect opt"}), 400
+        return jsonify({"message":"Otp verified"}), 200
+    except Exception as e:
+        print(f"Internal server error {str(e)}")
+        return jsonify({"message":"Internal server error"}), 500
 
 @admin.route('/admin_login', methods=["POST"])
 def admin_login():
