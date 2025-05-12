@@ -219,7 +219,7 @@ def verify_otp():
         if not data:
             return jsonify({"message":"Payload cannot be empty"}), 400
         email = data.get("email")
-        otp = data.get("opt")
+        otp = data.get("otp")
         
         if not otp or not email:
             return jsonify({"message":"All fiels required"}), 400
