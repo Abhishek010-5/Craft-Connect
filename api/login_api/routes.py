@@ -114,7 +114,7 @@ def signup():
                     return jsonify({"message":"failed to send opt"}), 400
                 return jsonify({"message": "Signup successful", "user":email, "email":"unverified"}), 201
             else:
-                return jsonify({"message": f"User status {user_in_pending_signups[0][0]}"}), 200
+                return jsonify({"message": f"User status {user_in_pending_signups[0][0]}"}), 400
         
         try:
             insert_user_to_pending(name, email, password)
