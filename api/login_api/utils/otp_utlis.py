@@ -24,14 +24,14 @@ def generate_otp() -> str:
 
     Example:
         >>> generate_otp()
-        'kB7@mP'
+        'kB78mP'
     """
     lower_case = ''.join(chr(ord("a") + i) for i in range(26))
     upper_case = ''.join(chr(ord('A') + i) for i in range(26))
     nums = "0123456789"
-    special_char = "~!@#$%^&*()_+?"
+    # special_char = "~!@#$%^&*()_+?"
     
-    all_char = lower_case + upper_case + nums + special_char
+    all_char = lower_case + upper_case + nums 
     
     return ''.join(secrets.choice(all_char) for _ in range(6))
 
