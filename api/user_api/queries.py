@@ -28,7 +28,7 @@ def get_top_users_query() -> str:
     return """
         SELECT u.id, u.name, u.email, up.points
         FROM users u
-        JOIN user_points up ON u.email = up.email
+        LEFT JOIN user_points up ON u.email = up.email
         ORDER BY up.points DESC
         LIMIT %(limit)s;
     """
