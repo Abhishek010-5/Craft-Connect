@@ -111,7 +111,8 @@ def get_users_(limit:int)->Optional[list[dict] | None]:
             user_details = {
                 "id":row[0] if row[0] else 'NA',
                 "name":row[1] if row[1] else 'NA',
-                "email":row[2] if row[2] else 'NA'
+                "email":row[2] if row[2] else 'NA',
+                "points":row[3] if row[3] else 0
             }
             users.append(user_details)
         return users
