@@ -2,7 +2,7 @@ from api.blueprints import auth
 from flask import jsonify, request, url_for
 from api.login_api.utils.validate_utils import validate_email, validate_password
 from api.login_api.utils.user_utils import user_exists, verify_user_password, user_exists_in_pending_signups, insert_user_to_pending, update_user_email_status, user_mail_verified, reset_user_password
-from datetime import datetime, timedelta
+import datetime
 from api.config import JWT_ALGORITHM, JWT_EXPIRY_MINUTES, JWT_SECRET_KEY
 import jwt
 from api.decoraters import token_required
@@ -218,7 +218,7 @@ def verify_email(email, field):
             return jsonify({"message":"Unable to fetch otp"})
         otp = otp_details.get("otp")
         valid_till = otp_details.get("valid_till")
-        curr_time = datetime.now()
+        curr_time = datetime.datetime.now()
         if valid_till < curr_time:
             jsonify({"message":"Opt time out "}), 400
 

@@ -8,7 +8,7 @@ from datetime import date
 from time import sleep
 from api.login_api.utils.validate_utils import*
 import jwt
-from datetime import timedelta
+import datetime
 from api.config import JWT_ALGORITHM, JWT_EXPIRY_MINUTES,JWT_SECRET_KEY
 from api.login_api.utils.otp_utlis import*
 @admin.route('/')
@@ -250,7 +250,7 @@ def verify_otp():
         
         db_otp = otp_details.get("otp")
         valid_till = otp_details.get("valid_till")
-        curr_time = datetime.now()
+        curr_time = datetime.datetime.now()
         
         if valid_till < curr_time:
             jsonify({"message":"Opt time out "}), 400
