@@ -190,7 +190,7 @@ def delete_user():
         email = data.get("email")
         if not email:
             return jsonify({"message":"Email is reuired"}), 400
-        response = delete_user()
+        response = delete_user(email)
         
         if not response:
             return jsonify({"message":"Unable to delete user"}), 400
