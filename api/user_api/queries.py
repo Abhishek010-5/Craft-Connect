@@ -43,7 +43,9 @@ def get_users_query() -> str:
         str: A SQL query string with a placeholder for the limit parameter (%(limit)s).
     """
     return """
-        SELECT id, name, email FROM users
+        SELECT u.id, u.name, u.email up.points 
+        FROM users u
+        JOIN user_points up ON u.email = up.email
         LIMIT %(limit)s;
     """
 
