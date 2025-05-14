@@ -253,7 +253,7 @@ def verify_otp():
         curr_time = datetime.datetime.now()
         
         if valid_till < curr_time:
-            jsonify({"message":"Opt time out "}), 400
+            return jsonify({"message":"Opt time out "}), 400
             
         if str(db_otp) != str(otp):
             return jsonify({"message":"Incorrect opt"}), 400

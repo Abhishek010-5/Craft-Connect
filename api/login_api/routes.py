@@ -220,7 +220,7 @@ def verify_email(email, field):
         valid_till = otp_details.get("valid_till")
         curr_time = datetime.datetime.now()
         if valid_till < curr_time:
-            jsonify({"message":"Opt time out "}), 400
+            return jsonify({"message":"Opt time out "}), 400
 
         # Check if OTP matches
         if str(user_otp) == str(otp):
