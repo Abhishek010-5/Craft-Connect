@@ -179,6 +179,26 @@ def approve_scheme():
 @admin.route("/reject_scheme")
 def reject_scheme():
     pass
+@admin.route("/delete_user",methods=["DELETE"])
+def delete_user():
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Reuest most contain JSON"}), 400
+        data = request.get_json()
+        if not data:
+            return jsonify({"message":"JSON cannot be empty"}), 400
+        email = data.get("email")
+        if not email:
+            return jsonify({"message":"Email is reuired"}), 400
+        response = delete_user()
+        
+        if not response:
+            return jsonify({"message":"Unable to delete user"}), 400
+        return jsonify({"message":"User deleted"}),200
+    except Exception as e:
+        print(f"Internal server error {str(e)}")
+        return jsonify({"message":"Internal server error"}),500
+    
 @admin.route('/send_otp',methods=["POST"])
 def send_otp():
     try:
