@@ -130,9 +130,11 @@ def delete_admin_query() -> str:
         WHERE email = %(email)s;
 """
 
-def update_user_details_query()->str:
+def update_user_details_query() -> str:
     return """
-        UPDATE user 
-        SET email = %(new_email)s, name = %(name)s, points = %(points)s
+        UPDATE users 
+        SET email = %(new_email)s, 
+            name = %(name)s, 
+            points = %(points)s 
         WHERE email = %(email)s;
-"""
+    """
