@@ -4,6 +4,7 @@
 from api.database import execute_query
 from api.admin_api.queries import*
 from typing import List, Dict, Optional, Any
+from psycopg2 import DatabaseError
 
 def get_user_from_pending_signups() -> Optional[List[Dict[str, Any]] | None]:
     """
@@ -239,4 +240,30 @@ def insert_user_to_user_point(email: str) -> bool:
     except Exception as e:
         raise RuntimeError(f"Database error occurred: {str(e)}")
         
+def update_user_details_(email: str, new_email: str, points: int, id: int) -> bool:
+    """
+    Updates user details in the database using the admin API.
+
+    Args:
+        email (str): The current email of the user.
+        new_email (str): The new email to set for the user.
+        points (int): The new points value to set for the user.
+        id (int): The unique identifier of the user.
+
+    Returns:
+        bool: True if the update was successful (at least one row affected), False otherwise.
+
+    Raises:
+        DatabaseError: If a database-related error occurs during query execution.
+        RuntimeError: If any other unexpected error occurs.
+    """
+    try:
+        query = update_user_details_query()
+        params = {"email": email, "new_email": new_email, "points": points, "id": id}
+        response = execute_query(query, params)
         
+        return response > 0
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error {str(dber)}")
+    except Exception as e:
+        raise RuntimeError(str(e))

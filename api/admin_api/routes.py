@@ -179,6 +179,38 @@ def approve_scheme():
 @admin.route("/reject_scheme")
 def reject_scheme():
     pass
+
+@admin.route('/update_user_details',methods=["POST"])
+def update_user_details():
+    try:
+        if request.is_json:
+            return jsonify({"message":"Request must contain JSON"}), 400
+        data = request.get_json()
+        
+        if not data or data == {}:
+            return jsonify({"message":"JSON cannot be empty"}), 400
+        
+        email = data.get("email")
+        new_email = data.get("new_email")
+        points = data.get("points")
+        id  = data.get("id")
+        
+        if not all([email, new_email, points, id]):
+            return jsonify({"message":"All fields required"}), 400
+        
+        if not isinstance(points, int) or not isinstance(id, int):
+            print(f"Error: 'points' must be int (got {type(points).__name__}: {points}), 'id' must be int (got {type(id).__name__}: {id})")
+            return jsonify({"message":"Type error"})
+        
+        response = update_user_details_(email, new_email, points, id)
+        if not response:
+            return jsonify({"message":"Unable to update the data check the data correctly"}), 400
+        return jsonify({"message":"user details updated"}), 200
+        
+    except Exception as e:
+        print(f"Internal server error {str(e)}")
+        return jsonify({"message":"Internal server error"}), 500
+    
 @admin.route("/delete_user",methods=["DELETE"])
 def delete_user():
     try:
