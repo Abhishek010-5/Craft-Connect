@@ -183,7 +183,7 @@ def reject_scheme():
 @admin.route('/update_user_details',methods=["POST"])
 def update_user_details():
     try:
-        if request.is_json:
+        if not request.is_json:
             return jsonify({"message":"Request must contain JSON"}), 400
         data = request.get_json()
         
