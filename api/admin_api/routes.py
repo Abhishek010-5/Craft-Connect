@@ -180,7 +180,7 @@ def approve_scheme():
 def reject_scheme():
     pass
 
-@admin.route('/update_user_details',methods=["POST"])
+@admin.route('/update_user_details',methods=["PUT"])
 def update_user_details():
     try:
         if not request.is_json:
@@ -191,18 +191,17 @@ def update_user_details():
             return jsonify({"message":"JSON cannot be empty"}), 400
         
         email = data.get("email")
-        new_email = data.get("new_email")
         points = data.get("points")
         name  = data.get("name")
         
-        if not all([email, new_email, points, name]):
+        if not all([email, points, name]):
             return jsonify({"message":"All fields required"}), 400
         
         if not isinstance(points, int):
             print(f"Error: 'points' must be int (got {type(points).__name__}: {points})")
             return jsonify({"message":"Type error"}), 400
         
-        response = update_user_details_(email, new_email, points, name)
+        response = update_user_details_(email, points, name)
         if not response:
             return jsonify({"message":"Unable to update the data check the data correctly"}), 400
         return jsonify({"message":"user details updated"}), 200

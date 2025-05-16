@@ -240,7 +240,7 @@ def insert_user_to_user_point(email: str) -> bool:
     except Exception as e:
         raise RuntimeError(f"Database error occurred: {str(e)}")
         
-def update_user_details_(email: str, new_email: str, points: int, name: str) -> bool:
+def update_user_details_(email: str, points: int, name: str) -> bool:
     """
     Updates user details in the database using the admin API.
 
@@ -259,7 +259,7 @@ def update_user_details_(email: str, new_email: str, points: int, name: str) -> 
     """
     try:
         query = update_user_details_query()
-        params = {"email": email, "new_email": new_email, "points": points, "name": name}
+        params = {"email": email, "points": points, "name": name}
         response = execute_query(query, params)
         
         return response > 0
