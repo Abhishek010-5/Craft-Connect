@@ -148,6 +148,7 @@ def get_scheme()->list[dict]:
         for row in response:
             try:
                 schemes_details = {
+                    "id": row[0] if row[0] else 0,
                     "Title": row[1] if row[1] else "N/A",
                     "valid_from": row[2] if row[2]  else "N/A",
                     "valid_till": row[3] if row[3] else "N/A",
@@ -159,6 +160,7 @@ def get_scheme()->list[dict]:
                 # Handle cases where row[2] or row[3] are not valid datetime objects or other issues
                 print(f"Error processing row {row}: {e}")
                 schemes_details = {
+                    "id": row[0] if row[0] else 0,
                     "Title": row[1] if row[1] else "N/A",
                     "valid_from": "N/A",
                     "valid_till": "N/A",
