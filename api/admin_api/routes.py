@@ -82,18 +82,19 @@ def delete_scheme():
         if not request.is_json:
             return jsonify({"message": "Request must contain JSON data"}), 400
         data = request.get_json()
-        scheme_title = data.get("scheme_title")
+        id_ = data.get("id")
         
         if not data:
             return jsonify({"message":"JSON is cannot be empty"}), 400
         
-        if not scheme_title:
-            return jsonify({"message":"Scheme Title is required"}), 400
-        response = remove_scheme(scheme_title)
-    
+        if not id_:
+            return jsonify({"message":"Scheme id is required"}), 400
+        response = remove_scheme(id_)
+        if not isinstance(id_, int):
+            return f"The scheme id should be of type int, but provided type is {type(id_).__name__}"
         if not response:
             return jsonify({"message":"Enter a valid Scheme Title"}), 400
-        return jsonify({"message":"Scheme delete","scheme_title":scheme_title}),200
+        return jsonify({"message":"Scheme delete","scheme_id":id_}),200
     except Exception:
         return jsonify({"message":"Internal server error occured"}), 500
     

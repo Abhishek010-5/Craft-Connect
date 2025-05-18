@@ -50,13 +50,11 @@ def add_scheme(scheme_title: str, valid_from: str, valid_to: str, perks: str, po
     except Exception as e:
         raise RuntimeError(f"Unexpected error while adding scheme: {str(e)}")
         
-def remove_scheme(scheme_title:str)->Optional[bool]:
-    if not isinstance(scheme_title, str):
-        return f"The scheme title should be of type str, but provided type is {type(scheme_title).__name__}"
+def remove_scheme(id_:int)->Optional[bool]:
 
     try:
         query = delete_scheme_query()
-        params = {"scheme_title":scheme_title}
+        params = {"id":id_}
         response = execute_query(query, params)
         
     except Exception as e:

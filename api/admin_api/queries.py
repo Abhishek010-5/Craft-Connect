@@ -61,7 +61,7 @@ def delete_scheme_query() -> str:
     """Delete a scheme from scheme table based on scheme title."""
     return """
         DELETE FROM scheme
-        WHERE scheme_title = %(scheme_title)s;
+        WHERE scheme_id = %(id)s;
     """
 
 def update_scheme_query() -> str:
