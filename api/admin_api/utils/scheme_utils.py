@@ -2,9 +2,10 @@
 # import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from api.database import execute_query
-from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query 
+from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query
 from datetime import date, datetime
 from typing import Optional
+from psycopg2 import DatabaseError
 
 def add_scheme(scheme_title: str, valid_from: str, valid_to: str, perks: str, points: int) -> bool:
     """
@@ -170,8 +171,28 @@ def get_scheme()->list[dict]:
 
     except Exception as e:
         raise RuntimeError(f"Error executing query or processing schemes: {e}")
+
+
+
+def get_schemes_to_approve()->list[dict]:
+    try:
+        query = get_scheme_redemption_details_query()
+        response = execute_query(query, fetch_results=True)
         
-
-
-
- 
+        if not response or response == []:
+            return None
+        details = []
+        for row in response:
+            applied_scheme = {
+                "application_Id":row[0] if row[0] else "NA",
+                "user_name":row[1] if row[1] else "NA",
+                "email":row[2] if row[2] else "NA",
+                "status":row[3] if row[3] else "pending",
+                "scheme_id":row[4] if row[4] else "NA"
+            }
+            details.append(applied_scheme)
+        return details
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error {str(dber)}")
+    except Exception as e:
+        raise RuntimeError({str(e)})

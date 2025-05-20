@@ -141,3 +141,8 @@ def update_user_details_query() -> str:
         SET points = %(points)s
         WHERE up.email = %(email)s;
     """
+    
+def get_scheme_redemption_details_query():
+    return"""
+        SELECT * FROM schemes_redemption;
+"""

@@ -171,7 +171,14 @@ def get_schemes():
     
 @admin.route('/get_scheme_to_approve')
 def get_scheme_to_approve():
-    pass
+    try:
+        applied_schemes = get_schemes_to_approve()
+        if not applied_schemes:
+            return jsonify({"message":"No scheme found"}), 404
+        return jsonify({"message":applied_schemes}), 200
+    except Exception as e:
+        print(str(e))
+        return jsonify({"message":"Internal server error"}), 500
     
 @admin.route('/approve_scheme')
 def approve_scheme():
