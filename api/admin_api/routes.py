@@ -186,7 +186,27 @@ def approve_scheme():
 
 @admin.route("/reject_scheme")
 def reject_scheme():
-    pass
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Request most contain JSON"}), 400
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"message":"JSON should not be empty"}), 400
+        id_ = data.get("id")
+        
+        if not id_:
+            return jsonify({"message":"JSON must contain the id field"}), 400
+        if not isinstance(id_, int):
+            return jsonify({"message":f"id' must be int (got {type(id_).__name__}: {id_})"}), 400
+        response = reject_scheme(id_)
+        
+        if not response:
+            return jsonify({"message":"Not able to update status"}), 400
+        return jsonify({"message":"Updated"}), 200
+    except Exception as e:
+        print(f"Internal error {str(e)}")
+        return jsonify({"message":"Internal server error"}), 500
 
 @admin.route('/update_user_details',methods=["PUT"])
 def update_user_details():

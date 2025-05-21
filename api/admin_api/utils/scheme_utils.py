@@ -2,7 +2,7 @@
 # import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from api.database import execute_query
-from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query
+from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query, reject_scheme_query
 from datetime import date, datetime
 from typing import Optional
 from psycopg2 import DatabaseError
@@ -196,3 +196,15 @@ def get_schemes_to_approve()->list[dict]:
         raise DatabaseError(f"Database error {str(dber)}")
     except Exception as e:
         raise RuntimeError({str(e)})
+    
+def reject_scheme(id_:int)->bool:
+    try:
+        query = reject_scheme_query()
+        params = {"id":id_}
+        response = execute_query(query,params)
+        
+        return response > 0
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error {str(dber)}")
+    except Exception as e:
+        raise RuntimeError(str(e))

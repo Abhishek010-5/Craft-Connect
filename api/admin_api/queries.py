@@ -146,3 +146,9 @@ def get_scheme_redemption_details_query():
     return"""
         SELECT * FROM schemes_redemption;
 """
+def reject_scheme_query():
+    return """
+        UPDATE schemes_redemption
+        SET status = "rejected"
+        WEHRE id = %(id)s;
+"""
