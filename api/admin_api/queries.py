@@ -146,9 +146,13 @@ def get_scheme_redemption_details_query():
     return"""
         SELECT * FROM schemes_redemption;
 """
-def reject_scheme_query():
+def reject_scheme_query_admin_api():
     return """
-        UPDATE schemes_redemption
-        SET status = "rejected"
-        WHERE id = %(id)s;
+        WITH updated AS (
+            UPDATE schemes_redemption
+            SET scheme_status = 'rejected'
+            WHERE id = %(id)s
+            RETURNING 1 AS success
+        )
+        SELECT COALESCE((SELECT success FROM updated), 0) AS result;
 """
