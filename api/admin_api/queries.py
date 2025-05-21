@@ -150,5 +150,5 @@ def reject_scheme_query():
     return """
         UPDATE schemes_redemption
         SET status = "rejected"
-        WEHRE id = %(id)s;
+        WHERE id = %(id)s;
 """
