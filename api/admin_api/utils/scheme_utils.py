@@ -203,7 +203,10 @@ def reject_scheme(id_:int)->bool:
         params = {"id":id_}
         response = execute_query(query,params, fetch_results=True)
         
-        return response > 0
+        if not response or response == []:
+            return False
+        
+        return response[0][0] > 0
     except DatabaseError as dber:
         raise DatabaseError(f"Database error {str(dber)}")
     except Exception as e:
