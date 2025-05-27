@@ -66,7 +66,7 @@
 - **Backend**: **Flask** (Python) for API logic.
 - **Database**: **PostgreSQL** for storing user, point, scheme, and admin data.
 - **Authentication**: **JWT** for secure access; `TTLCache` for temporary data.
-- **Frontend Integration**: Supports **HTML/CSS/JavaScript** frontend, optimized for mobile devices.
+
 
 ## File Structure
 - `.env`: Environment variables for configuration (e.g., `JWT_SECRET_KEY`).
@@ -120,4 +120,4 @@
 
 > **Note**: Ensure dependencies in `requirements.txt` are installed and the database is set up using `tables.sql` before running the application.
 
-For detailed documentation, request/response formats, or code, refer to the [GitHub repository](https://github.com/your-username/craft-connect) or contact `your-email@example.com`.
+For detailed documentation, request/response formats, or code, refer to the [GitHub repository](https://github.com/Abhishek010-5/Craft-Connect) or contact `abhishekkrana404@gmail.com`.
