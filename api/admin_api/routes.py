@@ -181,7 +181,7 @@ def get_scheme_to_approve():
         print(str(e))
         return jsonify({"message":"Internal server error"}), 500
     
-@admin.route('/approve_scheme')
+@admin.route('/approve_scheme',methods=["POST"])
 def approve_scheme():
     try:
         if not request.is_json:
