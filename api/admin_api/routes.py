@@ -195,7 +195,7 @@ def approve_scheme():
         
         if not scheme_id or not email:
             return jsonify({"message":"All fields required"}), 400
-        response = enough_points_for_scheme(email, scheme_id) 
+        response = enough_points_for_scheme(scheme_id, email) 
         if not  response[0]:
             return jsonify({"message":"Insuficient points"}), 400
         required_point = response[1]
