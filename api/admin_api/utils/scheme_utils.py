@@ -2,10 +2,11 @@
 # import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from api.database import execute_query
-from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query, reject_scheme_query
+from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query, reject_scheme_query, get_required_points_query
 from datetime import date, datetime
 from typing import Optional
 from psycopg2 import DatabaseError
+from api.points_api.queris import get_points_query
 
 def add_scheme(scheme_title: str, valid_from: str, valid_to: str, perks: str, points: int) -> bool:
     """
@@ -209,5 +210,47 @@ def reject_scheme(id_:int)->bool:
         return response > 0
     except DatabaseError as dber:
         raise DatabaseError(f"Database error {str(dber)}")
+    except Exception as e:
+        raise RuntimeError(str(e))
+def enough_points_for_scheme(scheme_id: int, email: str) -> tuple[bool, int]:
+    """
+    Check if a user has enough points for a specific scheme.
+
+    Args:
+        scheme_id (int): The ID of the scheme to check.
+        email (str): The user's email address.
+
+    Returns:
+        tuple[bool, int]: A tuple containing:
+            - bool: True if the user has enough points, False otherwise.
+            - int: The required points for the scheme.
+
+    Raises:
+        TypeError: If scheme_id is not an integer.
+        DatabaseError: If a database error occurs during query execution.
+        RuntimeError: For other unexpected errors.
+    """
+    try:
+        if not isinstance(scheme_id, int):
+            raise TypeError(f"The scheme id should be of type int, but provided {type(scheme_id).__name__}")
+        query_1 = get_points_query()
+        params_1 = {"email": email}
+        response_1 = execute_query(query_1, params_1, fetch_results=True)
+        
+        if not response_1 or response_1 == []:
+            return (False, 0)
+        user_points = response_1[0][0]
+        
+        query_2 = get_required_points_query()
+        params_2 = {"id": scheme_id}
+        response_2 = execute_query(query_2, params_2, fetch_results=True)
+        
+        if not response_2 or response_2 == []:
+            return (False, 0)
+        
+        required_points = response_2[0][0]
+        return (required_points <= user_points, required_points)
+    except DatabaseError as dber:
+        raise DatabaseError(f"Database error: {str(dber)}")
     except Exception as e:
         raise RuntimeError(str(e))

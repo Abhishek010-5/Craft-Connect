@@ -152,3 +152,12 @@ def reject_scheme_query_admin_api():
         SET scheme_status = 'rejected'
         WHERE id = %(id)s;
 """
+def get_required_points_query():
+    return """
+        SELECT points
+        FROM scheme
+        WHERE scheme_id = 
+            (SELECT scheme_id
+            FROM schemes_redemption
+            WHERE id = %(id)s)
+"""

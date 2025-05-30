@@ -11,6 +11,7 @@ import jwt
 import datetime
 from api.config import JWT_ALGORITHM, JWT_EXPIRY_MINUTES,JWT_SECRET_KEY
 from api.login_api.utils.otp_utlis import*
+from api.points_api.utils.points_util import redeem_user_points
 @admin.route('/')
 def home():
     """ 
@@ -182,7 +183,31 @@ def get_scheme_to_approve():
     
 @admin.route('/approve_scheme')
 def approve_scheme():
-    pass
+    try:
+        if not request.is_json:
+            return jsonify({"message":"Request must contain JSON"}), 400
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"message":"JSON must contain data"}), 400
+        scheme_id = data.get("id")
+        email = data.get("email")
+        
+        if not scheme_id or not email:
+            return jsonify({"message":"All fields required"}), 400
+        response = enough_points_for_scheme(email, scheme_id) 
+        if not  response[0]:
+            return jsonify({"message":"Insuficient points"}), 400
+        required_point = response[1]
+        res = redeem_user_points(email, required_point)
+        
+        if not res:
+            return jsonify({"message":"Not able to update point"}), 400
+        return jsonify({"message":"Updated"}), 200
+            
+    except Exception as e:
+        print("Internal server occred", e)
+        return jsonify({"message":"Internal server error"})
 
 @admin.route("/reject_scheme")
 def reject_scheme():
