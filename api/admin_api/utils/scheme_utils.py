@@ -2,7 +2,7 @@
 # import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from api.database import execute_query
-from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query, reject_scheme_query, get_required_points_query
+from api.admin_api.queries import insert_scheme_query, delete_scheme_query, update_scheme_query, get_scheme_query, get_scheme_redemption_details_query, reject_scheme_query, get_required_points_query, approve_scheme_query
 from datetime import date, datetime
 from typing import Optional
 from psycopg2 import DatabaseError
@@ -197,7 +197,19 @@ def get_schemes_to_approve()->list[dict]:
         raise DatabaseError(f"Database error {str(dber)}")
     except Exception as e:
         raise RuntimeError({str(e)})
-    
+
+def update_scheme_status(id_:int, email:int)->bool:
+    try:
+        if not isinstance(id_, int):
+            raise TypeError(f"The scheme id should be of type int, but provided {type(id_).__name__}")
+        query = approve_scheme_query()
+        params = {"id":id_, "email":email}
+        response = execute_query(query, params)
+        
+        return response > 0
+    except Exception as e:
+        raise RuntimeError(str(e))
+
 def reject_scheme(id_:int)->bool:
     try:
         query = reject_scheme_query()
@@ -212,6 +224,7 @@ def reject_scheme(id_:int)->bool:
         raise DatabaseError(f"Database error {str(dber)}")
     except Exception as e:
         raise RuntimeError(str(e))
+    
 def enough_points_for_scheme(scheme_id: int, email: str) -> tuple[bool, int]:
     """
     Check if a user has enough points for a specific scheme.

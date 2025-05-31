@@ -146,6 +146,14 @@ def get_scheme_redemption_details_query():
     return"""
         SELECT * FROM schemes_redemption;
 """
+
+def approve_scheme_query():
+    return """
+        UPDATE schemes_redemption
+        SET scheme_status = 'approved'
+        WHERE id = %(id)s AND email = %(email)s;
+"""    
+
 def reject_scheme_query_admin_api():
     return """
         UPDATE schemes_redemption

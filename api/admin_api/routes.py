@@ -199,10 +199,13 @@ def approve_scheme():
         if not  response[0]:
             return jsonify({"message":"Insuficient points"}), 400
         required_point = response[1]
-        res = redeem_user_points(email, required_point)
         
         if not res:
             return jsonify({"message":"Not able to update point"}), 400
+        res_2 = update_scheme_status(scheme_id, email)
+        if not res_2:
+            return jsonify({"message":"Unable to update the status, Please try later"}), 400
+        res = redeem_user_points(email, required_point)
         return jsonify({"message":"Updated"}), 200
             
     except Exception as e:
