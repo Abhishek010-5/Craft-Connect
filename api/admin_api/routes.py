@@ -210,7 +210,7 @@ def approve_scheme():
             
     except Exception as e:
         print("Internal server occred", e)
-        return jsonify({"message":"Internal server error"})
+        return jsonify({"message":"Internal server error"}), 500
 
 @admin.route("/reject_scheme")
 def reject_scheme():
