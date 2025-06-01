@@ -94,7 +94,7 @@ def get_users():
         print(f"errror:{str(e)}")
         return jsonify({"message":"Internal server error"}), 500
     
-@user.route('/scheme_status',methods=["GET"])
+@user.route('/scheme_status',methods=["POST"])
 def scheme_status():
     try:
         if not request.is_json:
