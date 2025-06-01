@@ -94,12 +94,12 @@ def get_users():
         print(f"errror:{str(e)}")
         return jsonify({"message":"Internal server error"}), 500
     
-@user.route('/scheme_status',methods=["POST"])
+@user.route('/scheme_status',methods=["GET"])
 def scheme_status():
     try:
         if not request.is_json:
             return jsonify({"message":"JSON paylaod required"}), 400
-        data = request.get("email")
+        data = request.get_json("email")
         if not data:
             return jsonify({"message":"JSON cannot be empty"}), 400
         email = data.get("email").strip()
